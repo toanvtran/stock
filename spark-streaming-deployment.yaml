@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-streaming
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spark-streaming
+  template:
+    metadata:
+      labels:
+        app: spark-streaming
+    spec:
+
+      containers:
+      - name: spark-streaming
+        image: toanvtran/spark-streaming:latest
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "my-cluster-kafka-bootstrap:9092"
+        - name: INFLUXDB_URL
+          value: "http://192.168.39.103:32086"
+        - name: INFLUXDB_TOKEN
+          value: "goj3LH8i65Kb1uvw3BSESSKimkBGlZWaJTVMRME6dAe4g3CnFsOduZ1mjLYxmDhGc1SgLvH6ih7cEiv_nZ5j2w=="
+        - name: INFLUXDB_ORG
+          value: "my-org"
+        - name: INFLUXDB_BUCKET
+          value: "my-bucket"
+        - name: INFLUXDB_MEASUREMENT
+          value: "stock_measurements"
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: checkpoint-volume
+          mountPath: /tmp/checkpoints
+      volumes:
+      - name: checkpoint-volume
+        emptyDir: {}
+      - name: shared-secret
+        emptyDir: {}
+ 

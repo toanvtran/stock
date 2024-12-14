@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: influxdb
+  namespace: influxdb
+  labels:
+    app: influxdb
+spec:
+  type: NodePort # Use LoadBalancer if required
+  ports:
+  - port: 8086
+    targetPort: 8086
+    nodePort: 32086 # Accessible on <NodeIP>:32086
+  selector:
+    app: influxdb

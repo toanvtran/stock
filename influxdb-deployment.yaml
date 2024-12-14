@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influxdb
+  namespace: influxdb
+  labels:
+    app: influxdb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: influxdb
+  template:
+    metadata:
+      labels:
+        app: influxdb
+    spec:
+      containers:
+      - name: influxdb
+        image: influxdb:2.7
+        ports:
+        - containerPort: 8086
+        env:
+        - name: DOCKER_INFLUXDB_INIT_MODE
+          value: "setup"
+        - name: DOCKER_INFLUXDB_INIT_USERNAME
+          value: "admin"
+        - name: DOCKER_INFLUXDB_INIT_PASSWORD
+          value: "password123"
+        - name: DOCKER_INFLUXDB_INIT_ORG
+          value: "my-org"
+        - name: DOCKER_INFLUXDB_INIT_BUCKET
+          value: "my-bucket"
+        - name: DOCKER_INFLUXDB_INIT_RETENTION
+          value: "7d" # Optional: Set data retention period
+        volumeMounts:
+        - name: influxdb-storage
+          mountPath: /var/lib/influxdb2
+      volumes:
+      - name: influxdb-storage
+        emptyDir: {} # Change this to PersistentVolumeClaim for persistent data storage
