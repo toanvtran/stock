@@ -1,6 +1,6 @@
 start:
     minikube delete
-    minikube start --cpus 7 --memory 16384 --container-runtime=cri-o --addons=metrics-server --driver=kvm2 
+    minikube start --cpus 7 --memory 8192 --container-runtime=cri-o --addons=metrics-server --driver=kvm2 (need about 6-8 GBs of memory)
 
 set up kafka:
     kubectl create namespace kafka
