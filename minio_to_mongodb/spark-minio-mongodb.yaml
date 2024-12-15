@@ -1,0 +1,66 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: spark-minio-to-mongo
+  namespace: batch
+spec:
+  schedule: "0 * * * *"  # Runs every hour at the start of the hour
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: spark-sa
+          initContainers:
+          - name: fetch-and-deploy-mongodb-secret
+            image: bitnami/kubectl:latest
+            command:
+            - sh
+            - -c
+            - |
+              # Fetch the mongodb secret from the mongodb namespace
+              kubectl get secret mongodb -n mongodb -o json | \
+              jq '.metadata.namespace="batch" | del(.metadata.resourceVersion, .metadata.uid, .metadata.creationTimestamp)' > /mnt/secrets/mongodb-secret.json
+
+              # Apply the secret to the batch namespace
+              kubectl apply -f /mnt/secrets/mongodb-secret.json -n batch
+
+              echo "MongoDB secret successfully deployed to batch namespace."
+            volumeMounts:
+            - name: shared-secret
+              mountPath: /mnt/secrets
+          containers:
+          - name: spark-minio-mongodb
+            image: toanvtran/spark-minio-mongodb:latest
+            env:
+            - name: MINIO_ENDPOINT
+              value: "http://minio-service.batch.svc.cluster.local:9000"
+            - name: MINIO_BUCKET
+              value: "your-bucket"
+            - name: MINIO_ACCESS_KEY
+              value: "minio"
+            - name: MINIO_SECRET_KEY
+              value: "minio123"
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb
+                  key: mongodb-root-password
+            - name: MONGO_URI
+              value: "mongodb://mongodb.mongodb.svc.cluster.local:27017"
+            - name: MONGO_DATABASE
+              value: "your_database"
+            - name: MONGO_COLLECTION
+              value: "your_collection"
+            resources:
+              limits:
+                memory: "1Gi"
+                cpu: "1000m"
+            volumeMounts:
+            - name: checkpoint-volume
+              mountPath: /tmp/checkpoints
+          restartPolicy: OnFailure
+          volumes:
+          - name: checkpoint-volume
+            emptyDir: {}
+          - name: shared-secret
+            emptyDir: {}

@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: spark-sa
+  namespace: batch
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: read-mongodb-secrets
+  namespace: mongodb
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list"]
+  
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: manage-batch-secrets
+  namespace: batch
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "create", "update", "patch"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: spark-sa-read-secrets
+  namespace: mongodb
+subjects:
+- kind: ServiceAccount
+  name: spark-sa
+  namespace: batch
+roleRef:
+  kind: Role
+  name: read-mongodb-secrets
+  apiGroup: rbac.authorization.k8s.io
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: spark-sa-manage-secrets
+  namespace: batch
+subjects:
+- kind: ServiceAccount
+  name: spark-sa
+  namespace: batch
+roleRef:
+  kind: Role
+  name: manage-batch-secrets
+  apiGroup: rbac.authorization.k8s.io
+

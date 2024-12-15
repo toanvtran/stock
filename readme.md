@@ -14,6 +14,7 @@
 minikube delete
 minikube start --cpus 7 --memory 8192 --container-runtime=cri-o --addons=metrics-server --driver=kvm2
 ```
+# speed layer
 ## Kafka
 ```
 kubectl create namespace kafka
@@ -104,12 +105,13 @@ from(bucket: "my-bucket")
 |> filter(fn: (r) => r["symbol"] == "bitcoin") 
 ```
 
-## batch layer
+# batch layer
 
 ```
+kubectl create namespace batch
 kubectl create -f spark_to_minio/minio-pvc.yaml -n batch
 kubectl create -f spark_to_minio/minio-deployment.yaml -n batch
-kubectl create -f spark_to_minio/tminio-service.yaml -n batch
+kubectl create -f spark_to_minio/minio-service.yaml -n batch
 kubectl apply -f spark_to_minio/checkpoint-pvc.yaml -n batch
 ```
 
@@ -123,3 +125,30 @@ kubectl apply -f spark_to_minio/spark-streaming-deployment.yaml
 ```
 
 See data in minio WebUI at `Object browser`.
+
+# serving layer
+
+## Mongodb
+
+Deploy mongodb:
+```
+kubectl create namespace mongodb
+helm install mongodb bitnami/mongodb -n mongodb
+```
+Wait until up and running
+
+## Spark
+
+Create service account for Spark to automatically get Mongodb password:
+```
+kubectl apply -f minio_to_mongodb/spark_sa_role.yaml
+```
+
+Deploy Spark to process data in MinIO and write into mongodb:
+
+```
+kubectl apply -f minio_to_mongodb/spark-minio-mongodb.yaml
+```
+
+## Mongodb chart
+

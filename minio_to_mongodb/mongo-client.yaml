@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mongo-client
+  namespace: mongodb  # Replace with your MongoDB namespace
+spec:
+  containers:
+    - name: mongo-client
+      image: mongo:8.0.3  # Use the version compatible with your MongoDB server
+      command: ['sleep', '3600']  # Keep the pod running for 1 hour
+  restartPolicy: Never
