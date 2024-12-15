@@ -1,0 +1,23 @@
+# metabase-pv-pvc.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: metabase-pv
+spec:
+  capacity:
+    storage: 128Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data/metabase
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: metabase-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 128Mi
