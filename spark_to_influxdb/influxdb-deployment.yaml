@@ -33,9 +33,18 @@ spec:
           value: "my-bucket"
         - name: DOCKER_INFLUXDB_INIT_RETENTION
           value: "7d" # Optional: Set data retention period
+        - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+          value: "my-influxdb-token"
         volumeMounts:
         - name: influxdb-storage
           mountPath: /var/lib/influxdb2
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
       volumes:
       - name: influxdb-storage
         emptyDir: {} # Change this to PersistentVolumeClaim for persistent data storage

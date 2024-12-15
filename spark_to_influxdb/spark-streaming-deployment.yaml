@@ -21,9 +21,9 @@ spec:
         - name: KAFKA_BOOTSTRAP_SERVERS
           value: "my-cluster-kafka-bootstrap:9092"
         - name: INFLUXDB_URL
-          value: "http://192.168.39.103:32086"
+          value: "http://192.168.39.206:32086"
         - name: INFLUXDB_TOKEN
-          value: "goj3LH8i65Kb1uvw3BSESSKimkBGlZWaJTVMRME6dAe4g3CnFsOduZ1mjLYxmDhGc1SgLvH6ih7cEiv_nZ5j2w=="
+          value: "my-influxdb-token"
         - name: INFLUXDB_ORG
           value: "my-org"
         - name: INFLUXDB_BUCKET

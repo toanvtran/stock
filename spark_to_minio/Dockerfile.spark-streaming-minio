@@ -1,0 +1,16 @@
+FROM bitnami/spark:3.4.1
+
+# Copy the application script to the appropriate directory
+COPY spark-streaming.py /opt/app/
+
+# Install Python dependencies
+RUN pip install pyspark pymongo influxdb-client==1.38.0 requests boto3
+
+# Download the Hadoop AWS package required for S3a
+# Ensure compatibility with Spark version 
+
+# Use the default entrypoint from the Bitnami Spark image
+ENTRYPOINT ["/opt/bitnami/scripts/spark/entrypoint.sh"]
+
+# Define the command to run your Spark job with the necessary Kafka packages
+CMD ["spark-submit", "--packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.1,org.apache.spark:spark-streaming-kafka-0-10_2.12:3.4.1,org.apache.hadoop:hadoop-aws:3.3.2,com.amazonaws:aws-java-sdk-bundle:1.11.901", "/opt/app/spark-streaming.py"]

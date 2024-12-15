@@ -1,0 +1,51 @@
+# spark-streaming-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-streaming
+  namespace: batch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spark-streaming
+  template:
+    metadata:
+      labels:
+        app: spark-streaming
+    spec:
+      containers:
+      - name: spark-streaming
+        image: toanvtran/spark-streaming-minio:latest
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092"
+        - name: MINIO_ENDPOINT
+          value: "http://minio-service.batch.svc.cluster.local:9000"
+        - name: MINIO_BUCKET
+          value: "your-bucket"
+        - name: CHECKPOINT_LOCATION
+          value: "s3a://your-bucket/checkpoints/"
+        # Mount MinIO credentials from Secrets
+        - name: MINIO_ACCESS_KEY
+          value: "minio"
+        - name: MINIO_SECRET_KEY
+          value: "minio123"
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: checkpoint-volume
+          mountPath: /opt/app/checkpoints
+        # Optional: If you need to mount additional volumes
+        # - name: shared-secret
+        #   mountPath: /path/to/mount
+      volumes:
+      - name: checkpoint-volume
+        persistentVolumeClaim:
+          claimName: spark-checkpoint-pvc
+      # Optional: If using additional volumes
+      # - name: shared-secret
+      #   emptyDir: {}
+      restartPolicy: Always

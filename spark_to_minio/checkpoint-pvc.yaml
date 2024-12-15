@@ -1,0 +1,13 @@
+# checkpoint-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: spark-checkpoint-pvc
+  namespace: batch
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 256Mi
+  storageClassName: standard

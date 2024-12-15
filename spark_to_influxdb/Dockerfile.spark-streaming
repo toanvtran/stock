@@ -1,0 +1,13 @@
+FROM bitnami/spark:3.4.1
+
+# Copy the application script to the appropriate directory
+COPY spark-streaming.py /opt/app/
+
+# Install Python dependencies
+RUN pip install pyspark pymongo influxdb-client==1.38.0 requests
+
+# Use the default entrypoint from the Bitnami Spark image
+ENTRYPOINT ["/opt/bitnami/scripts/spark/entrypoint.sh"]
+
+# Define the command to run your Spark job with the necessary Kafka and MongoDB packages
+CMD ["spark-submit", "--packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.1,org.apache.spark:spark-streaming-kafka-0-10_2.12:3.4.1,org.mongodb.spark:mongo-spark-connector_2.12:10.1.1", "/opt/app/spark-streaming.py"]
